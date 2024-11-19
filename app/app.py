@@ -13,6 +13,7 @@ with open('data/leituras.json', 'r') as f:
 with open('data/usuarios.json', 'r') as f:
     usuarios = json.load(f)
 
+# Rota para obter leituras filtradas por dia
 @app.route('/leituras', methods=['GET'])
 def get_leituras():
     dia = request.args.get('dia')  # Exemplo: "2024-11-20"
@@ -41,6 +42,7 @@ def get_leituras():
 
     return jsonify(resultado)
 
+# Rota para buscar informações de um usuário pelo ID
 @app.route('/usuario/<int:id_usuario>', methods=['GET'])
 def get_usuario(id_usuario):
     # Buscar usuário pelo ID
@@ -63,6 +65,33 @@ def get_usuario(id_usuario):
         "valor_em_reais": valor_em_reais
     })
 
+# Rota para login
+@app.route('/login', methods=['POST'])
+def login():
+    # Obter dados do corpo da requisição
+    data = request.get_json()
+
+    # Validar se email e senha foram enviados
+    email = data.get('email')
+    senha = data.get('senha')
+    if not email or not senha:
+        return jsonify({"error": "E-mail e senha são obrigatórios"}), 400
+
+    # Verificar se o usuário existe
+    usuario = next((u for u in usuarios if u['email'] == email and u['senha'] == senha), None)
+
+    if usuario:
+        return jsonify({
+            "message": "Login bem-sucedido",
+            "usuario": {
+                "id": usuario['id'],
+                "nome": usuario['nome'],
+                "email": usuario['email'],
+                "saldo_moedas": usuario['saldo_moedas']
+            }
+        }), 200
+    else:
+        return jsonify({"error": "E-mail ou senha inválidos"}), 401
 
 if __name__ == '__main__':
     app.run(debug=True)

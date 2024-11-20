@@ -7,10 +7,10 @@ app = Flask(__name__)
 CORS(app)
 
 # Carregar leituras e usuários do arquivo JSON
-with open('data/leituras.json', 'r') as f:
+with open('data/leituras.json', 'r', encoding='utf-8') as f:
     leituras = json.load(f)
 
-with open('data/usuarios.json', 'r') as f:
+with open('data/usuarios.json', 'r', encoding='utf-8') as f:
     usuarios = json.load(f)
 
 # Rota para obter leituras filtradas por dia
@@ -92,6 +92,44 @@ def login():
         }), 200
     else:
         return jsonify({"error": "E-mail ou senha inválidos"}), 401
+
+@app.route('/usuario/<int:id_usuario>/pagar', methods=['POST'])
+def pagar_conta(id_usuario):
+    # Buscar usuário pelo ID
+    usuario = next((u for u in usuarios if u['id'] == id_usuario), None)
+
+    if not usuario:
+        return jsonify({"error": "Usuário não encontrado"}), 404
+
+    # Obter os dados da requisição
+    data = request.get_json()
+    tipo_conta = data.get('tipo_conta')  # Exemplo: "Conta de Luz", "Conta de Água", etc.
+    valor = data.get('valor')  # Valor da conta em reais
+
+    if not tipo_conta or not valor:
+        return jsonify({"error": "Tipo de conta e valor são obrigatórios"}), 400
+
+    # Calcular o valor em moedas
+    valor_kwh = 0.656  # Valor do kWh em São Paulo
+    valor_moeda = valor_kwh * 25
+    moedas_necessarias = round(valor / valor_moeda, 2)
+
+    # Verificar se o saldo de moedas é suficiente
+    if usuario['saldo_moedas'] < moedas_necessarias:
+        return jsonify({"error": "Saldo insuficiente"}), 400
+
+    # Deduzir o saldo do usuário
+    usuario['saldo_moedas'] -= moedas_necessarias
+
+    # Salvar alterações no arquivo JSON
+    with open('data/usuarios.json', 'w', encoding='utf-8') as f:
+        json.dump(usuarios, f, ensure_ascii=False, indent=4)
+
+    return jsonify({
+        "message": f"Pagamento de {tipo_conta} realizado com sucesso.",
+        "saldo_moedas_restante": round(usuario['saldo_moedas'], 2)
+    }), 200
+
 
 if __name__ == '__main__':
     app.run(debug=True)

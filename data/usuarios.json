@@ -1,9 +1,0 @@
-[
-    {
-        "id": 1,
-        "nome": "João Silva",
-        "email": "joao.silva@example.com",
-        "senha": "senha123",
-        "saldo_moedas": 200.00
-    }
-]

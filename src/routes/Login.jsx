@@ -12,7 +12,7 @@ function Login() {
         setError(null); // Limpar mensagens de erro
 
         try {
-            const response = await fetch("http://localhost:5000/login", {
+            const response = await fetch("http://localhost:8080/api/login", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -23,11 +23,11 @@ function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                // Armazenar o ID do usuário no localStorage
-                localStorage.setItem("userId", data.usuario.id);
+                // Ajuste aqui para lidar com o retorno direto do objeto do usuário
+                localStorage.setItem("userId", data.id); // Armazena o ID do usuário no localStorage
                 navigate("/user"); // Redirecionar para a página do usuário
             } else {
-                setError(data.error); // Mostrar mensagem de erro
+                setError(data); // Mostrar mensagem de erro diretamente
             }
         } catch (err) {
             setError("Erro ao conectar ao servidor.");

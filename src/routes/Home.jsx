@@ -10,6 +10,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
 
 ChartJS.register(
@@ -19,7 +20,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler,
 );
 
 function Home() {
@@ -30,36 +32,47 @@ function Home() {
     const [mediaPessoas, setMediaPessoas] = useState(0);
 
     useEffect(() => {
-        fetch(`http://localhost:5000/leituras?dia=${dia}`)
-            .then((response) => response.json())
-            .then((data) => {
-                if (data.error) {
-                    setData([]);
-                    setTotalEnergia(0);
-                    setTotalMoedas(0);
-                    setMediaPessoas(0);
-                } else {
-                    setData(data);
-
-                    // Calcular indicadores
-                    const totalEnergiaGerada = data.reduce((acc, curr) => acc + curr.energia_gerada, 0);
-                    const totalMoedasCriadas = totalEnergiaGerada * 1; // Exemplo: 1 moeda para cada 10 kWh gerados
-                    const pessoas = totalEnergiaGerada / 0.00015; // Exemplo: cada pessoa gera 0.35 kWh em média
-
-                    setTotalEnergia(totalEnergiaGerada.toFixed(2));
-                    setTotalMoedas(totalMoedasCriadas.toFixed(2));
-                    setMediaPessoas(Math.round(pessoas));
+        fetch(`http://localhost:8080/api/leituras?dia=${dia}`)
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Erro na API: " + response.status);
                 }
+                return response.json();
             })
-            .catch((error) => console.error("Erro ao buscar leituras:", error));
+            .then((data) => {
+                if (!Array.isArray(data)) {
+                    throw new Error("Dados inválidos: o backend não retornou um array.");
+                }
+
+                setData(data);
+
+                // Calcular indicadores
+                const totalEnergiaGerada = data.reduce(
+                    (acc, curr) => acc + (curr.energia_gerada || 0),
+                    0
+                );
+                const totalMoedasCriadas = totalEnergiaGerada * 1; // 1 moeda por kWh gerado
+                const pessoas = totalEnergiaGerada / 0.00015; // Exemplo: cada pessoa gera 0.00015 kWh
+
+                setTotalEnergia(totalEnergiaGerada.toFixed(2));
+                setTotalMoedas(totalMoedasCriadas.toFixed(2));
+                setMediaPessoas(Math.round(pessoas));
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar leituras:", error);
+                setData([]);
+                setTotalEnergia(0);
+                setTotalMoedas(0);
+                setMediaPessoas(0);
+            });
     }, [dia]);
 
     const chartData = {
-        labels: data.map((d) => d.hora), // Exibir horas completas
+        labels: Array.isArray(data) ? data.map((d) => d.hora) : [],
         datasets: [
             {
                 label: "Energia Gerada (kWh)",
-                data: data.map((d) => d.energia_gerada),
+                data: Array.isArray(data) ? data.map((d) => d.energia_gerada) : [],
                 borderColor: "rgba(75, 192, 192, 1)",
                 backgroundColor: "rgba(75, 192, 192, 0.2)",
                 fill: true,
@@ -69,7 +82,7 @@ function Home() {
 
     const chartOptions = {
         responsive: true,
-        maintainAspectRatio: false, // Permite ajustar o tamanho via CSS
+        maintainAspectRatio: false,
         plugins: {
             legend: {
                 display: true,
@@ -126,7 +139,7 @@ function Home() {
             </div>
             {/* Gráfico */}
             <div className="chart-container">
-                {data.length > 0 ? (
+                {Array.isArray(data) && data.length > 0 ? (
                     <Line data={chartData} options={chartOptions} />
                 ) : (
                     <p>Nenhum dado disponível para o dia selecionado.</p>

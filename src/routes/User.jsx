@@ -19,7 +19,7 @@ function User() {
             return;
         }
 
-        fetch(`http://localhost:5000/usuario/${userId}`)
+        fetch(`http://localhost:8080/api/usuario/${userId}`)
             .then((response) => response.json())
             .then((data) => {
                 if (data.error) {
@@ -32,7 +32,7 @@ function User() {
     }, [userId, navigate]);
 
     const handlePagar = () => {
-        fetch(`http://localhost:5000/usuario/${userId}/pagar`, {
+        fetch(`http://localhost:8080/api/usuario/${userId}/pagar`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -64,7 +64,7 @@ function User() {
                     <p><strong>Email:</strong> {usuario.email}</p>
                     <p><strong>Saldo de Moedas:</strong> {usuario.saldo_moedas}</p>
                     <p><strong>Valor em Reais:</strong> R$ {usuario.valor_em_reais}</p>
-                    <button onClick={() => setModalOpen(true)}>Pagar Conta</button>
+                    <button className="pagar-btn" onClick={() => setModalOpen(true)}>Pagar Conta</button>
                 </div>
             ) : (
                 <p>Carregando informações do usuário...</p>
@@ -88,11 +88,12 @@ function User() {
                                 type="number"
                                 value={valor}
                                 onChange={(e) => setValor(e.target.value)}
+                                min="0"
                             />
                         </label>
                         <p>Saldo disponível: R$ {usuario.valor_em_reais}</p>
-                        <button onClick={handlePagar}>Pagar</button>
-                        <button onClick={() => setModalOpen(false)}>Cancelar</button>
+                        <button className="confirmar-btn" onClick={handlePagar}>Pagar</button>
+                        <button className="cancelar-btn" onClick={() => setModalOpen(false)}>Cancelar</button>
                     </div>
                 </div>
             )}

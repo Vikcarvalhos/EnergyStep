@@ -10,6 +10,10 @@ function User() {
     const [message, setMessage] = useState(null);
     const navigate = useNavigate();
 
+    // Taxa de conversão de moedas para reais
+    const VALOR_KWH = 0.656; // Valor do kWh em reais
+    const VALOR_MOEDA = VALOR_KWH * 25; // Valor de 1 moeda em reais
+
     // Obter o ID do usuário do localStorage
     const userId = localStorage.getItem("userId");
 
@@ -25,7 +29,9 @@ function User() {
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    setUsuario(data);
+                    // Calcular o valor em reais a partir do saldo de moedas
+                    const valorEmReais = (data.saldo_moedas * VALOR_MOEDA).toFixed(2);
+                    setUsuario({ ...data, valor_em_reais: valorEmReais });
                 }
             })
             .catch((error) => console.error("Erro ao buscar informações do usuário:", error));
@@ -44,9 +50,13 @@ function User() {
                 if (data.error) {
                     alert(data.error);
                 } else {
+                    const novoSaldo = data.saldo_moedas_restante;
+                    const novoValorReais = (novoSaldo * VALOR_MOEDA).toFixed(2);
+
                     setUsuario((prev) => ({
                         ...prev,
-                        saldo_moedas: data.saldo_moedas_restante,
+                        saldo_moedas: novoSaldo,
+                        valor_em_reais: novoValorReais,
                     }));
                     setMessage(data.message);
                     setModalOpen(false);

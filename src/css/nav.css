@@ -1,0 +1,48 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #FFFFFF; /* Fundo branco */
+    color: #004D00; /* Verde-escuro */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+    position: relative; /* Necessário para centralizar a logo */
+}
+
+.logo {
+    height: 60px;
+    width: auto;
+    display: block;
+}
+
+.navbar-brand a {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+    text-decoration: none;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    list-style: none; /* Remove bullets */
+    padding: 0;
+    margin: 0;
+}
+
+.navbar-links a,
+.logout-button {
+    color: #004D00; /* Verde-escuro para os links */
+    text-decoration: none;
+    padding: 8px 12px;
+    border: none;
+    font-size: 1rem;
+    text-align: center;
+}
+
+.logout-button:hover,
+.navbar-links a:hover {
+    background-color: rgba(0, 77, 0, 0.1); /* Verde-claro no hover */
+    border-radius: 5px;
+}

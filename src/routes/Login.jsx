@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../css/login.css";
 
 function Login() {
     const [email, setEmail] = useState("");
@@ -9,7 +10,7 @@ function Login() {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setError(null); // Limpar mensagens de erro
+        setError(null);
 
         try {
             const response = await fetch("http://localhost:8080/api/login", {
@@ -23,11 +24,10 @@ function Login() {
             const data = await response.json();
 
             if (response.ok) {
-                // Ajuste aqui para lidar com o retorno direto do objeto do usuário
-                localStorage.setItem("userId", data.id); // Armazena o ID do usuário no localStorage
-                navigate("/user"); // Redirecionar para a página do usuário
+                localStorage.setItem("userId", data.id);
+                navigate("/user");
             } else {
-                setError(data); // Mostrar mensagem de erro diretamente
+                setError(data);
             }
         } catch (err) {
             setError("Erro ao conectar ao servidor.");
@@ -35,34 +35,34 @@ function Login() {
     };
 
     return (
-        <div>
-            <h1>Login</h1>
-            <form onSubmit={handleLogin}>
-                <div>
-                    <label>
+        <div className="container">
+            <div className="login-container">
+                <h1>Login</h1>
+                <form onSubmit={handleLogin}>
+                    <label htmlFor="email">
                         E-mail:
                         <input
+                            id="email"
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                         />
                     </label>
-                </div>
-                <div>
-                    <label>
+                    <label htmlFor="senha">
                         Senha:
                         <input
+                            id="senha"
                             type="password"
                             value={senha}
                             onChange={(e) => setSenha(e.target.value)}
                             required
                         />
                     </label>
-                </div>
-                <button type="submit">Entrar</button>
-                {error && <p style={{ color: "red" }}>{error}</p>}
-            </form>
+                    <button type="submit">Entrar</button>
+                    {error && <p className="error-message">{error}</p>}
+                </form>
+            </div>
         </div>
     );
 }

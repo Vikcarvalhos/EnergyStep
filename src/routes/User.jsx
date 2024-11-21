@@ -10,11 +10,9 @@ function User() {
     const [message, setMessage] = useState(null);
     const navigate = useNavigate();
 
-    // Taxa de conversão de moedas para reais
     const VALOR_KWH = 0.656; // Valor do kWh em reais
     const VALOR_MOEDA = VALOR_KWH * 25; // Valor de 1 moeda em reais
 
-    // Obter o ID do usuário do localStorage
     const userId = localStorage.getItem("userId");
 
     useEffect(() => {
@@ -29,7 +27,6 @@ function User() {
                 if (data.error) {
                     alert(data.error);
                 } else {
-                    // Calcular o valor em reais a partir do saldo de moedas
                     const valorEmReais = (data.saldo_moedas * VALOR_MOEDA).toFixed(2);
                     setUsuario({ ...data, valor_em_reais: valorEmReais });
                 }
@@ -66,15 +63,19 @@ function User() {
     };
 
     return (
-        <div>
-            <h1>Informações do Usuário</h1>
+        <div className="user-page">
+            <header>
+                <h1>Informações do Usuário</h1>
+            </header>
             {usuario ? (
-                <div>
+                <div className="user-info">
                     <p><strong>Nome:</strong> {usuario.nome}</p>
                     <p><strong>Email:</strong> {usuario.email}</p>
                     <p><strong>Saldo de Moedas:</strong> {usuario.saldo_moedas}</p>
                     <p><strong>Valor em Reais:</strong> R$ {usuario.valor_em_reais}</p>
-                    <button className="pagar-btn" onClick={() => setModalOpen(true)}>Pagar Conta</button>
+                    <button className="pagar-btn" onClick={() => setModalOpen(true)}>
+                        Pagar Conta
+                    </button>
                 </div>
             ) : (
                 <p>Carregando informações do usuário...</p>
@@ -84,31 +85,50 @@ function User() {
                 <div className="modal">
                     <div className="modal-content">
                         <h2>Pagar Conta</h2>
-                        <label>
-                            Tipo de Conta:
-                            <select value={tipoConta} onChange={(e) => setTipoConta(e.target.value)}>
-                                <option value="Conta de Luz">Conta de Luz</option>
-                                <option value="Conta de Água">Conta de Água</option>
-                                <option value="Boleto">Boleto</option>
-                            </select>
-                        </label>
-                        <label>
-                            Valor (R$):
-                            <input
-                                type="number"
-                                value={valor}
-                                onChange={(e) => setValor(e.target.value)}
-                                min="0"
-                            />
-                        </label>
-                        <p>Saldo disponível: R$ {usuario.valor_em_reais}</p>
-                        <button className="confirmar-btn" onClick={handlePagar}>Pagar</button>
-                        <button className="cancelar-btn" onClick={() => setModalOpen(false)}>Cancelar</button>
+                        <form onSubmit={(e) => e.preventDefault()}>
+                            <label>
+                                Tipo de Conta:
+                                <select
+                                    value={tipoConta}
+                                    onChange={(e) => setTipoConta(e.target.value)}
+                                >
+                                    <option value="Conta de Luz">Conta de Luz</option>
+                                    <option value="Conta de Água">Conta de Água</option>
+                                    <option value="Boleto">Boleto</option>
+                                </select>
+                            </label>
+                            <label>
+                                Valor (R$):
+                                <input
+                                    type="number"
+                                    value={valor}
+                                    onChange={(e) => setValor(e.target.value)}
+                                    min="0"
+                                />
+                            </label>
+                            <p>Saldo disponível: <strong>R$ {usuario.valor_em_reais}</strong></p>
+                            <div className="modal-buttons">
+                                <button
+                                    type="button"
+                                    className="confirmar-btn"
+                                    onClick={handlePagar}
+                                >
+                                    Confirmar Pagamento
+                                </button>
+                                <button
+                                    type="button"
+                                    className="cancelar-btn"
+                                    onClick={() => setModalOpen(false)}
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             )}
 
-            {message && <p style={{ color: "green" }}>{message}</p>}
+            {message && <p className="success-message">{message}</p>}
         </div>
     );
 }

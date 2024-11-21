@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Line } from "react-chartjs-2";
-import "../css/style.css";
+import "../css/home.css";
+import { FaBolt, FaCoins, FaUsers } from "react-icons/fa";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -68,13 +69,13 @@ function Home() {
     }, [dia]);
 
     const chartData = {
-        labels: Array.isArray(data) ? data.map((d) => d.hora) : [],
+        labels: data.map((d) => d.hora),
         datasets: [
             {
                 label: "Energia Gerada (kWh)",
-                data: Array.isArray(data) ? data.map((d) => d.energia_gerada) : [],
-                borderColor: "rgba(75, 192, 192, 1)",
-                backgroundColor: "rgba(75, 192, 192, 0.2)",
+                data: data.map((d) => d.energia_gerada),
+                borderColor: "#4CAF50",
+                backgroundColor: "rgba(76, 175, 80, 0.2)",
                 fill: true,
             },
         ],
@@ -110,42 +111,42 @@ function Home() {
     };
 
     return (
-        <div>
-            <h1>Dashboard de Energia</h1>
-            <div>
-                <label>
-                    Dia:
+        <main className="dashboard">
+            <header className="dashboard-container">
+                <h1>Dashboard de Energia</h1>
+                <div className="date-picker">
                     <input
+                        id="date"
                         type="date"
                         value={dia}
                         onChange={(e) => setDia(e.target.value)}
                     />
-                </label>
-            </div>
-            {/* Indicadores */}
-            <div className="indicators">
+                </div>
+            </header>
+
+            <section className="indicators">
                 <div className="indicator">
-                    <h3>Total de Energia Gerada</h3>
+                    <FaBolt className="icon" />
+                    <h3>Total de Energia</h3>
                     <p>{totalEnergia} kWh</p>
                 </div>
                 <div className="indicator">
-                    <h3>Total de Moedas Criadas</h3>
-                    <p>{totalMoedas} moedas</p>
+                    <FaCoins className="icon" />
+                    <h3>Total de Moedas</h3>
+                    <p>{totalMoedas}</p>
                 </div>
                 <div className="indicator">
-                    <h3>Média de Pessoas</h3>
-                    <p>{mediaPessoas} pessoas</p>
+                    <FaUsers className="icon" />
+                    <h3>Média Pessoas</h3>
+                    <p>{mediaPessoas}</p>
                 </div>
-            </div>
+            </section>
+                
             {/* Gráfico */}
-            <div className="chart-container">
-                {Array.isArray(data) && data.length > 0 ? (
-                    <Line data={chartData} options={chartOptions} />
-                ) : (
-                    <p>Nenhum dado disponível para o dia selecionado.</p>
-                )}
-            </div>
-        </div>
+            <section className="chart-container">
+                {data.length > 0 ? <Line data={chartData} /> : <p>Nenhum dado disponível.</p>}
+            </section>
+        </main>
     );
 }
 
